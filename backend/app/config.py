@@ -34,7 +34,8 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     
     # Frontend
-    FRONTEND_URL: str = "http://localhost:8080"
+   # Frontend
+    FRONTEND_URL: str = "https://ai-planner-mu-six.vercel.app"
     
     class Config:
         env_file = ".env"
