@@ -31,15 +31,17 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL, "http://localhost:8080", "http://127.0.0.1:8080"],
+    allow_origins=[
+        "https://ai-planner-mu-six.vercel.app",
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        "capacitor://localhost",
+        "ionic://localhost"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-import os
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
