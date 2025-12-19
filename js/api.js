@@ -7,24 +7,16 @@
 function getApiBaseUrl() {
     // Check if running in Capacitor (mobile app)
     if (window.Capacitor) {
-        // Production API URL - UPDATE THIS with your deployed backend URL
-        // For development, you can use your local IP address (e.g., http://192.168.1.100:8000)
-        return 'https://api.plannerwinter.com/api/v1'; // Replace with your actual API URL
+        // Production API URL
+        return 'https://aiplanner-production-1165.up.railway.app/api/v1';
     }
 
-    // Web development & Production (Same Origin)
-    // When served by the backend, /api/v1 is relative to the root.
-    // If running via http-server separately, we might need localhost:8000, 
-    // but let's assume unified deployment or proxy.
-    // Ideally, for local dev with separate servers, we keep the localhost:8000 fallback,
-    // but for production web app served by FastAPI, we want relative path.
-
+    // Local development with separate frontend server
     if (window.location.hostname === 'localhost' && window.location.port === '8080') {
-        // Local development with separate frontend server
         return 'http://localhost:8000/api/v1';
     }
 
-    // Production Web App (served by backend)
+    // Production Web App
     return '/api/v1';
 }
 
