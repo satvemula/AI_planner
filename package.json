@@ -4,7 +4,8 @@
   "description": "AI-powered Task Planner mobile app",
   "main": "index.html",
   "scripts": {
-    "dev": "npx http-server . -p 8080 -c-1",
+    "start": "node server.js",
+    "dev": "npx http-server . -p 8080",
     "build": "npm run copy-assets",
     "copy-assets": "echo 'Assets ready for mobile'",
     "cap:sync": "npx cap sync",
@@ -37,5 +38,3 @@
     "three": "^0.160.0"
   }
 }
-
-
