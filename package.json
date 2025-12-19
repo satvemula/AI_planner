@@ -1,0 +1,41 @@
+{
+  "name": "planner-winter",
+  "version": "1.0.0",
+  "description": "AI-powered Task Planner mobile app",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server . -p 8080 -c-1",
+    "build": "npm run copy-assets",
+    "copy-assets": "echo 'Assets ready for mobile'",
+    "cap:sync": "npx cap sync",
+    "cap:add:ios": "npx cap add ios",
+    "cap:add:android": "npx cap add android",
+    "cap:open:ios": "npx cap open ios",
+    "cap:open:android": "npx cap open android",
+    "cap:run:ios": "npx cap run ios",
+    "cap:run:android": "npx cap run android"
+  },
+  "keywords": [
+    "task-planner",
+    "mobile-app",
+    "capacitor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@capacitor/cli": "^5.5.1",
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "@capacitor/core": "^5.5.1",
+    "@capacitor/app": "^5.0.6",
+    "@capacitor/haptics": "^5.0.6",
+    "@capacitor/keyboard": "^5.0.6",
+    "@capacitor/status-bar": "^5.0.6",
+    "@capacitor/preferences": "^5.0.6",
+    "@capacitor/splash-screen": "^5.0.6",
+    "three": "^0.160.0"
+  }
+}
+
+

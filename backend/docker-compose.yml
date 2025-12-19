@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://planner:plannerpassword@db:5432/planner_db
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-default_secret_key_change_me}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEBUG=False
+      # Use the container path as the static files root if we copy them in, 
+      # or we rely on the mount below.
+    volumes:
+      # Mount the backend code for development (optional, removed for prod-like behavior by default)
+      # - ./:/app
+      
+      # Mount the frontend directory from the host to /app/static in the container
+      # Relative to this docker-compose.yml file (which is in backend/)
+      - ../:/app/static
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=planner
+      - POSTGRES_PASSWORD=plannerpassword
+      - POSTGRES_DB=planner_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Expose for local debugging if needed
+    restart: always
+
+volumes:
+  postgres_data:

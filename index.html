@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Task Planner - Organize your tasks with AI-powered duration estimation and intuitive calendar scheduling">
+  <title>Task Planner</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/notebook.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563EB'%3E%3Cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z'/%3E%3C/svg%3E">
+  
+  <!-- Three.js CDN -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <!-- Notebook 3D Container -->
+  <div id="notebook-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;"></div>
+  
+  <div class="app" style="position: relative; z-index: 2;">
+    <!-- Desktop Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
+        </svg>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#home" class="sidebar-link active" data-tab="home">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+          </svg>
+          <span>Home</span>
+        </a>
+        <a href="#tasks" class="sidebar-link" data-tab="tasks">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" />
+          </svg>
+          <span>Tasks</span>
+        </a>
+        <a href="#calendar" class="sidebar-link" data-tab="calendar">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" />
+          </svg>
+          <span>Calendar</span>
+        </a>
+        <a href="#settings" class="sidebar-link" data-tab="settings">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+          </svg>
+          <span>Settings</span>
+        </a>
+        <a href="#" class="sidebar-link" id="logout-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="main-content">
+
+      <!-- Home Tab -->
+      <section class="tab-content active" id="tab-home">
+        <header class="page-header">
+          <h1 class="page-title" id="greeting">Good Morning</h1>
+          <p class="page-subtitle">Here's what you have planned for today</p>
+        </header>
+
+        <!-- Today Overview Card -->
+        <div class="today-card">
+          <p class="today-date" id="current-date">Monday, December 16, 2024</p>
+          <h2>Today's Overview</h2>
+          <div class="today-stats">
+            <div class="today-stat">
+              <div class="today-stat-value" id="total-tasks">5</div>
+              <div class="today-stat-label">Total Tasks</div>
+            </div>
+            <div class="today-stat">
+              <div class="today-stat-value" id="completed-tasks">2</div>
+              <div class="today-stat-label">Completed</div>
+            </div>
+            <div class="today-stat">
+              <div class="today-stat-value" id="pending-tasks">3</div>
+              <div class="today-stat-label">Pending</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Tasks -->
+        <div class="section-header">
+          <h3 class="section-title">Upcoming Tasks</h3>
+          <a href="#tasks" class="btn btn-ghost">View All</a>
+        </div>
+        <div class="content-grid cols-2" id="upcoming-tasks">
+          <!-- Tasks will be populated by JavaScript -->
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="section-header" style="margin-top: var(--space-8);">
+          <h3 class="section-title">This Week</h3>
+        </div>
+        <div class="content-grid cols-3">
+          <div class="stats-card">
+            <div class="stats-card-value" id="week-total">12</div>
+            <div class="stats-card-label">Tasks Scheduled</div>
+          </div>
+          <div class="card">
+            <div
+              style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-priority-low);">
+              8</div>
+            <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">Hours Planned</div>
+          </div>
+          <div class="card">
+            <div
+              style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-category-work);">
+              85%</div>
+            <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">Completion Rate</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tasks Tab -->
+      <section class="tab-content" id="tab-tasks">
+        <header class="page-header">
+          <h1 class="page-title">Task List</h1>
+          <p class="page-subtitle">Manage all your tasks in one place</p>
+        </header>
+
+        <!-- Filter Chips -->
+        <div class="chip-container">
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="work">Work</button>
+          <button class="chip" data-filter="personal">Personal</button>
+          <button class="chip" data-filter="health">Health</button>
+          <button class="chip" data-filter="high">High Priority</button>
+        </div>
+
+        <!-- Today's Tasks -->
+        <div class="section-header" style="margin-top: var(--space-6);">
+          <h3 class="section-title">Today</h3>
+        </div>
+        <div class="task-list" id="today-task-list">
+          <!-- Tasks will be populated by JavaScript -->
+        </div>
+
+        <!-- Upcoming Tasks -->
+        <div class="section-header" style="margin-top: var(--space-6);">
+          <h3 class="section-title">Upcoming</h3>
+        </div>
+        <div class="task-list" id="upcoming-task-list">
+          <!-- Tasks will be populated by JavaScript -->
+        </div>
+
+        <!-- Completed Tasks -->
+        <div class="section-header" style="margin-top: var(--space-6);">
+          <h3 class="section-title">Completed</h3>
+        </div>
+        <div class="task-list" id="completed-task-list">
+          <!-- Tasks will be populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- Calendar Tab -->
+      <section class="tab-content" id="tab-calendar">
+        <div class="calendar-container">
+          <header class="calendar-header">
+            <div class="calendar-nav">
+              <button class="calendar-nav-btn" id="cal-prev" aria-label="Previous">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                </svg>
+              </button>
+              <h2 class="calendar-title" id="calendar-title">December 2024</h2>
+              <button class="calendar-nav-btn" id="cal-next" aria-label="Next">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" />
+                </svg>
+              </button>
+            </div>
+            <div class="calendar-actions">
+              <button class="btn btn-ghost" style="color: white;" id="cal-today">Today</button>
+              <select id="cal-view" class="form-input"
+                style="padding: var(--space-2); background-color: rgba(255,255,255,0.1); color: white; border-color: transparent; width: auto;">
+                <option value="day">Day</option>
+                <option value="week" selected>Week</option>
+              </select>
+            </div>
+          </header>
+          <div class="calendar-body">
+            <div class="calendar-grid" id="calendar-grid">
+              <!-- Time slots will be generated by JavaScript -->
+            </div>
+            <aside class="task-sidebar" id="task-sidebar">
+              <div class="task-sidebar-toggle" id="sidebar-toggle"></div>
+              <div class="task-sidebar-header">
+                <h3 class="task-sidebar-title">Unscheduled Tasks</h3>
+                <span class="text-secondary" id="unscheduled-count">(0)</span>
+              </div>
+              <div class="task-list" id="unscheduled-tasks">
+                <!-- Unscheduled tasks will be populated by JavaScript -->
+              </div>
+              
+              <!-- Calendar Connections -->
+              <div style="margin-top: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--color-border);">
+                <h4 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-3);">Connect Calendar</h4>
+                <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                  <button class="btn btn-ghost" id="connect-google-btn" style="justify-content: flex-start;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-2);">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    Connect Google
+                  </button>
+                  <button class="btn btn-ghost" id="connect-microsoft-btn" style="justify-content: flex-start;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-2);">
+                      <path fill="#F25022" d="M1 1h10v10H1z"/>
+                      <path fill="#00A4EF" d="M13 1h10v10H13z"/>
+                      <path fill="#7FBA00" d="M1 13h10v10H1z"/>
+                      <path fill="#FFB900" d="M13 13h10v10H13z"/>
+                    </svg>
+                    Connect Microsoft
+                  </button>
+                </div>
+                <div id="calendar-connections" style="margin-top: var(--space-4); font-size: var(--font-size-xs); color: var(--color-text-secondary);">
+                  <!-- Connected calendars will be shown here -->
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section class="tab-content" id="tab-settings">
+        <header class="page-header">
+          <h1 class="page-title">Settings</h1>
+          <p class="page-subtitle">Customize your experience</p>
+        </header>
+
+        <div class="card" style="padding: 0;">
+          <!-- Account Section -->
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="list-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+              </div>
+              <div class="list-item-text">
+                <span class="list-item-title">Account</span>
+                <span class="list-item-subtitle">Manage your profile</span>
+              </div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--color-text-muted);">
+              <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" />
+            </svg>
+          </div>
+
+          <!-- Notifications -->
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="list-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                </svg>
+              </div>
+              <div class="list-item-text">
+                <span class="list-item-title">Notifications</span>
+                <span class="list-item-subtitle">Enable push notifications</span>
+              </div>
+            </div>
+            <div class="toggle active" id="toggle-notifications"></div>
+          </div>
+
+          <!-- AI Duration Estimation -->
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="list-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.53-9.11-.02-12.58s9.14-3.49 12.65 0L21 3v7.12z" />
+                </svg>
+              </div>
+              <div class="list-item-text">
+                <span class="list-item-title">AI Duration Estimation</span>
+                <span class="list-item-subtitle">Automatically estimate task duration</span>
+              </div>
+            </div>
+            <div class="toggle active" id="toggle-ai"></div>
+          </div>
+
+          <!-- Theme -->
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="list-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+                </svg>
+              </div>
+              <div class="list-item-text">
+                <span class="list-item-title">Theme</span>
+                <span class="list-item-subtitle">Light mode</span>
+              </div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--color-text-muted);">
+              <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" />
+            </svg>
+          </div>
+
+          <!-- About -->
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="list-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                </svg>
+              </div>
+              <div class="list-item-text">
+                <span class="list-item-title">About</span>
+                <span class="list-item-subtitle">Version 1.0.0</span>
+              </div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--color-text-muted);">
+              <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" />
+            </svg>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <a href="#home" class="bottom-nav-link active" data-tab="home">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="#tasks" class="bottom-nav-link" data-tab="tasks">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" />
+        </svg>
+        <span>Tasks</span>
+      </a>
+      <a href="#calendar" class="bottom-nav-link" data-tab="calendar">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
+        </svg>
+        <span>Calendar</span>
+      </a>
+      <a href="#settings" class="bottom-nav-link" data-tab="settings">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+        </svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fab-add" aria-label="Add new task">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Task Creation Modal -->
+  <div class="modal-backdrop" id="task-modal">
+    <div class="modal" role="dialog" aria-labelledby="modal-title">
+      <header class="modal-header">
+        <h2 class="modal-title" id="modal-title">Add New Task</h2>
+        <button class="modal-close" id="modal-close" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+          </svg>
+        </button>
+      </header>
+      <div class="modal-body">
+        <form id="task-form">
+          <!-- Task Name -->
+          <div class="form-group">
+            <label class="form-label" for="task-name">Task Name *</label>
+            <input type="text" id="task-name" class="form-input" placeholder="Enter task name..." required>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label class="form-label" for="task-description">Description</label>
+            <textarea id="task-description" class="form-input" rows="3"
+              placeholder="Add details about this task..."></textarea>
+          </div>
+
+          <!-- Duration Estimation -->
+          <div class="form-group">
+            <label class="form-label">⏱️ Estimated Duration</label>
+            <div class="duration-group">
+              <div class="duration-estimate" id="ai-estimate">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.53-9.11-.02-12.58s9.14-3.49 12.65 0L21 3v7.12z" />
+                </svg>
+                <span id="ai-duration-text">AI: -- min</span>
+              </div>
+              <div>
+                <input type="number" id="manual-duration" class="form-input" placeholder="Override (min)" min="5"
+                  step="5">
+              </div>
+            </div>
+            <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--space-2);">
+              AI estimates duration based on task complexity. Override if needed.
+            </p>
+          </div>
+
+          <!-- Date and Category Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="task-date">📅 Due Date</label>
+              <input type="date" id="task-date" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="task-category">🏷️ Category</label>
+              <select id="task-category" class="form-input">
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="health">Health</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Priority -->
+          <div class="form-group">
+            <label class="form-label">⭐ Priority</label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="priority" value="low">
+                <span>Low</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="priority" value="medium" checked>
+                <span>Medium</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="priority" value="high">
+                <span>High</span>
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="modal-cancel">Cancel</button>
+        <button type="submit" form="task-form" class="btn btn-primary">Create Task</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Authentication Modal -->
+  <div class="modal-backdrop" id="auth-modal" style="z-index: 2000;">
+    <div class="modal" role="dialog" aria-labelledby="auth-title">
+      <header class="modal-header">
+        <h2 class="modal-title" id="auth-title">Welcome</h2>
+      </header>
+      <div class="modal-body">
+
+        <!-- Login Form -->
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email</label>
+            <input type="email" id="login-email" class="form-input" placeholder="Enter your email" required
+              autocapitalize="off">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+          </div>
+          <p id="login-error"
+            style="color: var(--color-priority-high); font-size: 0.9rem; display: none; margin-top: 10px;"></p>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Sign In</button>
+        </form>
+
+        <!-- Register Form (Hidden by default) -->
+        <form id="register-form" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="register-name">Full Name</label>
+            <input type="text" id="register-name" class="form-input" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="register-email">Email</label>
+            <input type="email" id="register-email" class="form-input" placeholder="Enter your email" required
+              autocapitalize="off">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="register-password">Password</label>
+            <input type="password" id="register-password" class="form-input"
+              placeholder="Choose a password (min 8 chars)" required minlength="8">
+          </div>
+          <p id="register-error"
+            style="color: var(--color-priority-high); font-size: 0.9rem; display: none; margin-top: 10px;"></p>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Create Account</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+          <span id="auth-switch-text">Don't have an account?</span>
+          <a href="#" id="auth-switch-btn"
+            style="color: var(--color-primary); text-decoration: none; font-weight: bold;">Sign Up</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="js/app.js" type="module"></script>
+</body>
+
+</html>
