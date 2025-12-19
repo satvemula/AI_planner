@@ -28,7 +28,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
+from fastapi.middleware.cors import CORSMiddleware
+
+# CORS middleware - MUST be before routes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -36,13 +38,14 @@ app.add_middleware(
         "http://localhost:8080",
         "http://127.0.0.1:8080",
         "capacitor://localhost",
-        "ionic://localhost"
+        "ionic://localhost",
+        "*"  # Temporarily allow all for debugging
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
-
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
 
