@@ -1,0 +1,10 @@
+{
+    "build": {
+        "builder": "DOCKERFILE"
+    },
+    "deploy": {
+        "startCommand": "cd backend && ./entrypoint.sh",
+        "healthcheckPath": "/health",
+        "restartPolicyType": "ON_FAILURE"
+    }
+}

@@ -30,4 +30,5 @@ COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
 # Run the application using the entrypoint script
-CMD ["./entrypoint.sh"]
+# Use ENTRYPOINT to prevent Railway from overriding it with a default command
+ENTRYPOINT ["./entrypoint.sh"]
