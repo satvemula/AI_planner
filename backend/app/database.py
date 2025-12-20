@@ -5,6 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
+from app.config import settings
+
+# Debug: Check if DATABASE_URL is set
+print(f"DATABASE_URL: {settings.DATABASE_URL}")
+if not settings.DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is not set!")
 
 
 # Create async engine
