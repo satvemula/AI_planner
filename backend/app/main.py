@@ -1,13 +1,21 @@
 """
 AI Planner Backend - FastAPI Application
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("App starting...")
+    yield
+    print("App shutting down...")
 
 app = FastAPI(
     title="AI Planner API",
     description="Backend API for the AI-powered Task Planner application",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # CORS middleware
