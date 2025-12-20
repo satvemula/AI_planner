@@ -34,18 +34,10 @@ app = FastAPI(
 # CORS middleware - MUST be before routes
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://ai-planner-mu-six.vercel.app",
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        "capacitor://localhost",
-        "ionic://localhost",
-        "*"
-    ],
+    allow_origins=["*"],  # Allow all for now
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
 )
 
 # Include API routes
