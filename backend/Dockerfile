@@ -4,6 +4,9 @@ FROM python:3.11-slim
 # Set work directory
 WORKDIR /app
 
+# Ensure python logs are output immediately
+ENV PYTHONUNBUFFERED=1
+
 # Install system dependencies (needed for some python packages like psycopg2)
 RUN apt-get update && apt-get install -y \
     build-essential \
