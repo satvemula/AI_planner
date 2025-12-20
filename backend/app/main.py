@@ -12,21 +12,20 @@ from app.database import engine, Base
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events."""
-    print("Starting lifespan...")
+    print("🚀 STARTUP: Creating database tables...")
     try:
-        print("Creating database tables...")
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-            print("Tables created successfully")
+            print("✅ STARTUP: Tables created")
     except Exception as e:
-        print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"❌ STARTUP ERROR: {e}")
+        raise
     
-    print("✓ Lifespan complete, app ready for requests")
+    print("✅ STARTUP COMPLETE - App is ready for requests")
     yield
-    print("Shutting down...")
+    print("🛑 SHUTDOWN: Disposing database...")
     await engine.dispose()
+    print("✅ SHUTDOWN COMPLETE")
 
 
 app = FastAPI(
@@ -45,4 +44,5 @@ app.add_middleware(
 
 @app.get("/health")
 async def health_check():
+    print("📍 Health endpoint called")
     return {"status": "ok"}
