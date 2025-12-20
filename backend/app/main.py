@@ -9,8 +9,6 @@ from app.config import settings
 from app.api.v1.router import api_router
 from app.database import engine, Base
 import os
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,8 +28,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-from fastapi.middleware.cors import CORSMiddleware
-
 # CORS middleware - MUST be before routes
 app.add_middleware(
     CORSMiddleware,
@@ -41,28 +37,16 @@ app.add_middleware(
         "http://127.0.0.1:8080",
         "capacitor://localhost",
         "ionic://localhost",
-        "*"  # Temporarily allow all for debugging
+        "*"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
-
-# Mount static files
-# We expect the frontend files to be mounted or copied to /app/static in the container,
-# or strictly speaking, they are in the parent directory of backend locally.
-# In Docker, we mounted ../ to /app/static. 
-# We serve the specific folders (css, js, assets) and the index.html.
-
-static_dir = "/app/static"
-if not os.path.exists(static_dir):
-    # Fallback for local development without docker (assuming running from backend dir)
-    static_dir = "../"
-)
-
 
 @app.get("/health")
 async def health_check():
