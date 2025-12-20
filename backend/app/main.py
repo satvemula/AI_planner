@@ -9,6 +9,8 @@ from app.config import settings
 from app.api.v1.router import api_router
 from app.database import engine, Base
 import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
