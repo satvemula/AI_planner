@@ -61,16 +61,7 @@ static_dir = "/app/static"
 if not os.path.exists(static_dir):
     # Fallback for local development without docker (assuming running from backend dir)
     static_dir = "../"
-
-app.mount("/css", StaticFiles(directory=os.path.join(static_dir, "css")), name="css")
-app.mount("/js", StaticFiles(directory=os.path.join(static_dir, "js")), name="js")
-# Mount other assets if they exist, e.g., images, icons.
-if os.path.exists(os.path.join(static_dir, "assets")):
-    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
-
-@app.get("/")
-async def read_index():
-    return FileResponse(os.path.join(static_dir, "index.html"))
+)
 
 
 @app.get("/health")
