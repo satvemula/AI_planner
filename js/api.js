@@ -17,7 +17,7 @@ function getApiBaseUrl() {
     }
 
     // Production Web App
-    return '/api/v1';
+    return 'https://aiplanner-production-1165.up.railway.app/api/v1';
 }
 
 const API_BASE_URL = getApiBaseUrl();

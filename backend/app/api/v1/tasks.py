@@ -2,7 +2,7 @@
 Task API routes.
 """
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,8 +16,15 @@ from app.schemas import (
     ErrorResponse
 )
 from app.services.auth import get_current_user
-from app.services.llm import estimate_duration_with_llm
 
+# Lazy import LLM to avoid startup crashes
+def get_estimate_function():
+    try:
+        from app.services.llm import estimate_duration_with_llm
+        return estimate_duration_with_llm
+    except Exception as e:
+        print(f"Warning: Could not import LLM service: {e}")
+        return None
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
@@ -40,7 +47,16 @@ async def create_task(
     if task_data.description:
         description_for_estimate += f" - {task_data.description}"
     
-    estimate = await estimate_duration_with_llm(description_for_estimate)
+    estimate_fn = get_estimate_function()
+    if estimate_fn:
+        estimate = await estimate_fn(description_for_estimate)
+    else:
+        # Fallback: use provided duration or default
+        estimate = DurationEstimateResponse(
+            estimated_duration=task_data.manual_duration or 30,
+            confidence=0.5,
+            reasoning="Using fallback estimation"
+        )
     
     # Create task
     task = Task(
@@ -236,8 +252,6 @@ async def schedule_task(
 ):
     """
     Schedule a task to a specific time slot (drag-and-drop target).
-    
-    Sets is_scheduled=TRUE and populates scheduled_start_time.
     """
     result = await db.execute(
         select(Task).where(
@@ -329,7 +343,14 @@ async def estimate_duration(
 ):
     """
     Get LLM-estimated duration for a task description.
-    
-    Can be called before creating a task to preview the estimate.
     """
-    return await estimate_duration_with_llm(request.task_description)
+    estimate_fn = get_estimate_function()
+    if estimate_fn:
+        return await estimate_fn(request.task_description)
+    else:
+        # Fallback
+        return DurationEstimateResponse(
+            estimated_duration=30,
+            confidence=0.5,
+            reasoning="Using fallback estimation"
+        )
