@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.api.v1.router import api_router
 from app.database import engine, Base
-
+import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
