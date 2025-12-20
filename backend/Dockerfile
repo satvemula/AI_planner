@@ -25,4 +25,5 @@ EXPOSE 8000
 
 # Run the application using Gunicorn (production) or Uvicorn (dev)
 # Using uvicorn directly for simplicity in this setup as gunicorn needs a config file or long command
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use shell form to allow variable expansion for $PORT (required by Railway)
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
