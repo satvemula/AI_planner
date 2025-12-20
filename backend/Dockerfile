@@ -34,5 +34,5 @@ RUN chmod +x entrypoint.sh
 
 # Run the application using the entrypoint script
 # Use ENTRYPOINT to prevent Railway from overriding it with a default command
-# Run the application using shell to allow variable expansion
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Run the application using the entrypoint script
+CMD ["./entrypoint.sh"]
