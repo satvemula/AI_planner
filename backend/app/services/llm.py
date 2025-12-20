@@ -7,8 +7,12 @@ from typing import Optional
 from openai import AsyncOpenAI
 from pydantic import BaseModel
 
-from app.config import settings
 from app.schemas import DurationEstimateResponse
+from app.config import settings
+
+# Safety check
+if not settings.OPENAI_API_KEY:
+    print("WARNING: OPENAI_API_KEY is not set, LLM features will use fallback")
 
 
 SYSTEM_PROMPT = """You are a task duration estimation assistant. 
@@ -37,15 +41,7 @@ class DurationEstimate(BaseModel):
 
 
 async def estimate_duration_with_llm(task_description: str) -> DurationEstimateResponse:
-    """
-    Use OpenAI API to estimate task duration.
-    
-    Args:
-        task_description: Natural language description of the task
-        
-    Returns:
-        DurationEstimateResponse with estimated minutes and confidence
-    """
+    """Use OpenAI API to estimate task duration."""
     if not settings.OPENAI_API_KEY:
         # Fallback to heuristic estimation if no API key
         return estimate_duration_heuristic(task_description)
