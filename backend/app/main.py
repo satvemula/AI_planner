@@ -13,16 +13,24 @@ import os
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events."""
+    print("Starting lifespan...")
     try:
-        # Startup: Create tables
+        print("Creating database tables...")
         async with engine.begin() as conn:
+            print("Engine connected")
             await conn.run_sync(Base.metadata.create_all)
+            print("Tables created successfully")
     except Exception as e:
-        print(f"Error creating tables: {e}")
+        print(f"ERROR in lifespan: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    print("Lifespan startup complete")
     yield
-    # Shutdown: cleanup if needed
+    
+    print("Shutting down...")
     await engine.dispose()
-
+    print("Shutdown complete")
 
 app = FastAPI(
     title="AI Planner API",
@@ -41,7 +49,7 @@ app.add_middleware(
 )
 
 # Include API routes
-app.include_router(api_router, prefix="/api/v1")
+#app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/health")
 async def health_check():
