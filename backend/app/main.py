@@ -1,6 +1,8 @@
 """
 AI Planner Backend - FastAPI Application
 """
+import os
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,9 @@ from app.api.v1.router import api_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print("DEBUG: Starting application lifespan...")
+    print(f"DEBUG: Current working directory: {os.getcwd()}")
+    print(f"DEBUG: PORT from env is: {os.environ.get('PORT')}")
     yield
 
 app = FastAPI(
